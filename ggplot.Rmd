@@ -1,0 +1,376 @@
+---
+title: "Data Visualization with `ggplot2`"
+output:
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: true
+      smooth_scroll: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.height = 3)
+```
+
+This lab focuses on data visualization and how to create high quality graphics using the `ggplot2` package. In this lab we will use cleaned data, with subsequent labs covering how to manipulate data prior to graphing.
+
+**Directions** (Please read before starting)
+
+1) Please *work together* with your assigned partner. Make sure you both fully understand something before moving on.
+2) Please record your answers to lab questions separately from the lab's examples. You and your partner should only turn in responses to lab questions, nothing more and nothing less.
+3) Please ask for help, clarification, or even just a check-in if anything seems unclear.
+
+$~$
+
+## Preamble
+
+### Packages and Datasets
+
+This lab will use the `ggplot2` package:
+
+```{r}
+# install.packages("ggplot2")
+library(ggplot2)
+```
+
+It will also use data from The College Scorecard:
+
+```{r}
+colleges <- read.csv("https://remiller1450.github.io/data/Colleges2019.csv")
+```
+
+- **Description**: The `colleges` data set contains attributes and outcomes for all primarily undergraduate institutions in the United States with at least 400 full-time students for the year 2019.
+
+$~$
+
+### How `ggplot2` creates graphics
+
+`ggplot2` package builds graphics in a structured manner using *layers*. Layers are sequentially added to a graph, with each serving a particular purpose, such as:
+
+1) Displaying raw data
+2) Displaying a statistical summary
+3) Adding metadata (ie: annotations, context, references, etc.)
+
+Consider the following examples:
+
+```{r, fig.show="hold", out.width="50%"}
+## Example #1.1 - nothing (just a base layer)
+ggplot(data = colleges, mapping = aes(x = Cost, y = Net_Tuition))
+
+## Example #1.2 - add a layer displaying raw data
+ggplot(data = colleges, mapping = aes(x = Cost, y = Net_Tuition)) +
+  geom_point()
+```
+
+```{r, fig.show="hold", out.width="50%"}
+## Example #1.3 - add another layer (smoother)
+ggplot(data = colleges, mapping = aes(x = Cost, y = Net_Tuition)) +
+  geom_point() +
+  geom_smooth()
+
+## Example #1.4 - add another layer (reference text)
+ggplot(data = colleges, mapping = aes(x = Cost, y = Net_Tuition)) +
+  geom_point() +
+  geom_smooth() + 
+  annotate("text", x =20000, y=40000, label = "Data from 2019")
+```
+
+*Note*: A high-quality graphic doesn't require any particular number of layers. In fact, more layers can sometimes detract from the clarity of a data visualization.
+
+$~$
+
+### More on the base layer
+
+The `mapping` and `data` arguments provided in the base layer are carried forward to all subsequent layers (which is often desirable). However, we can avoid this behavior.
+
+```{r, fig.show="hold", out.width="50%"}
+## Example #2.1
+ggplot(data = colleges, mapping = aes(x = Cost, y = Net_Tuition, color = Region)) +
+  geom_point()
+
+## Example #2.2 (local override of color aesthetic)
+ggplot(data = colleges, mapping = aes(x = Cost, y = Net_Tuition, color = Region)) +
+  geom_point(color = "red")
+```
+
+Specifying aesthetics locally within layers:
+
+```{r, fig.show="hold", out.width="50%"}
+## Example #3.1
+ggplot(data = colleges) +
+  geom_point(mapping = aes(x = Cost, y = Net_Tuition)) 
+
+## Example #3.2
+ggplot(data = colleges) +
+  geom_point(mapping = aes(x = Cost, y = Net_Tuition)) +
+  geom_point(mapping = aes(x = Cost, y = Enrollment), color = "red")
+```
+
+Local specification is most useful when you want to add layers that involve the same parameters ("x" and "y" in the example above) but for different things. Common examples are drawing a line through several different group means of an ordinal categorical variable, or displaying both polygons and points on a map.
+
+$~$
+
+### Terminology
+
+The `ggplot` framework is unique because all graphics are *grammatically defined* using the following terminology:
+
+- **Aesthetics** (or "aes") - mappings of variables to visual cues representing their values (ie: position on the x-axis)
+- **Geometric elements** (or "geom") - what you actually see in the plot (ie: points, lines, etc.)
+- **Scales** - guidelines for how aesthetic mappings should be displayed (ie: logarithmic x-axis, red to blue color palate, etc.)
+- **Guides** (or "legends") - references to help a human reader interpret the aesthetics
+- **Facets** - rules specifying how to break up and separately display subsets of data
+
+**Question #1**: Identify and briefly describe each term mentioned above in the graphic created by the code below.
+
+```{r}
+ggplot(data = colleges, mapping = aes(x = Adm_Rate, color = Private)) + 
+  geom_density() +
+  scale_x_continuous(trans = "reverse") +
+  facet_wrap(~Region)
+```
+
+```{r, echo = FALSE, eval = FALSE}
+## Aesthetics - X and color are aesthetics
+## Geom - density curve
+## Scale - descending linear scale from 1 to 0 (need to say descending)
+## Guides - color
+## Facet - split by geographic region
+```
+
+**Question #2**: Create a histogram of the variable "Enrollment" displayed on the log2-scale and faceted by the variable "Private". Use the [ggplot2 cheatsheet](https://raw.githubusercontent.com/rstudio/cheatsheets/main/data-visualization.pdf) to help you identify the necessary functions and arguments.
+
+```{r, echo = FALSE, eval = FALSE}
+ggplot(data = colleges, mapping = aes(x = Enrollment)) + 
+  geom_histogram() +
+  scale_x_continuous(trans = "log2") + 
+  facet_wrap(~Private)
+```
+
+$~$
+
+## Lab
+
+At this point you will begin working with your partner. Please read through the text/examples and make sure you both understand before attempting to answer the embedded questions.
+
+`ggplot` graphics are a very expansive topic and not everything can be self-contained in this lab. Throughout the lab, I encourage you to reference the following resources if you need to figure out the proper function or syntax for a particular task:
+
+- [ggplot2 cheatsheet](https://raw.githubusercontent.com/rstudio/cheatsheets/main/data-visualization.pdf)
+- [ggplot2 book](https://ggplot2-book.org/)
+
+$~$
+
+### Themes
+
+Themes are pre-built style templates used to better tailor a graphic to the mode of publication. 
+
+The example below applies a black and white theme to Example 2.1 from the preamble.
+
+```{r}
+## Example #2.1 w/ black and white theme
+ggplot(data = colleges, mapping = aes(x = Cost, y = Net_Tuition, color = Region)) +
+  geom_point() +
+  theme_bw() 
+```
+
+Other pre-built themes:
+
+- `theme_bw()`
+- `theme_linedraw()`, `theme_light()` and `theme_dark()`
+- `theme_minimal()`
+- `theme_classic()`
+- `theme_void()`
+
+You can judge the differences in these themes below:
+
+```{r, echo = FALSE, fig.height = 4.5, fig.width = 7.5}
+df <- data.frame(x = 1:3, y = 1:3)
+base <- ggplot(df, aes(x, y)) + geom_point()
+p1 = base + theme_grey() + ggtitle("theme_grey()")
+p2 = base + theme_bw() + ggtitle("theme_bw()")
+p3 = base + theme_linedraw() + ggtitle("theme_linedraw()")
+p4 = base + theme_light() + ggtitle("theme_light()")
+p5 = base + theme_dark() + ggtitle("theme_dark()")
+p6 = base + theme_minimal()  + ggtitle("theme_minimal()")
+p7 = base + theme_classic() + ggtitle("theme_classic()")
+p8 = base + theme_void() + ggtitle("theme_void()")
+gridExtra::grid.arrange(p1,p2,p3,p4,p5,p6,p7,p8, nrow = 2)
+```
+
+Any theme can be further customized using `theme()`. Most commonly this function is used to remove a graph's legend:
+
+```{r}
+## Example #2.1 w/ black and white theme
+ggplot(data = colleges, mapping = aes(x = Cost, y = Net_Tuition, color = Region)) +
+  geom_point() +
+  theme_bw() +
+  theme(legend.position = "none")
+```
+
+
+**Question #3**: The code below creates a line graph that depicts (via a smoothed moving average) the approval of former presidents Jimmy Carter, Ronald Reagan, and Barrack Obama. Modify second portion of this code to try out a few different non-default themes. Then, briefly discuss (1-2 sentences) which themes you feel are most effective and least effective for this type of graph. Include the graph with your preferred theme in your lab write-up. 
+
+```{r, message = FALSE, warning=FALSE}
+## Data processing
+approval <- read.csv("https://bit.ly/398YR6M")
+approval$Week = as.numeric(difftime(as.Date(approval$End.Date, "%m/%d/%y"), as.Date(approval$Inaug.Date, "%m/%d/%y"), units = "weeks"))
+approval2 = subset(approval, President %in% c("Reagan", "Carter", "Obama"))
+
+## Creating the graph
+ggplot(data = approval2, mapping = aes(x = Week, y = Approving, color = President)) +
+ geom_smooth(method = "loess", span = 0.6, se = FALSE)
+```
+
+$~$
+
+### Labels and Annotations
+
+Labels and annotations are important aspects of well-constructed data visualizations. They are used to provide context, or draw the viewer's attention towards particular aspects of the graphic.
+
+Labels corresponding to *aesthetics* (such as `x`, `y`, `color`, etc.) are controlled using the `labs()` function:
+
+```{r}
+ggplot(data = colleges, mapping = aes(x = Cost, y = Net_Tuition, color = Adm_Rate)) +
+  geom_point() +
+  labs(x = "Sticker Cost", y = "Price Paid", color = "Admissions Rate")
+```
+
+Annotations are added the graphic as a layer using the `annotate()` function:
+
+```{r}
+ggplot(data = colleges, mapping = aes(x = Cost, y = Net_Tuition, color = Adm_Rate)) +
+  geom_point() + 
+  annotate(geom = "rect", xmin = 65000, xmax = 77000, ymin = 20000, ymax = 52000, color = "red", alpha = 0.2)
+```
+
+The example above annotates a scatter plot by drawing a red rectangle with 20% transparency (controlled by `alpha`) around the cluster of colleges with high costs, high net tuition, and low admissions rates.
+
+**Question #4**: Use the `subset()` function to create a data frame containing only colleges located in the state of Iowa. Using these data, create a box plot of admissions rates, rename the x-axis label to "Admissions Rate", and add a text annotation above the outlier saying "Grinnell".
+
+```{r, eval = FALSE, echo = FALSE}
+iowa_colleges = subset(colleges, State == "IA")
+ggplot(data = iowa_colleges, aes(x = Adm_Rate)) + 
+  geom_boxplot() +
+  annotate(geom = "text", x = 0.3, y = 0.05, label = "Grinnell")
+```
+
+$~$
+
+### Scales
+
+Scales map values in the data space to the aesthetic space (ie: where and how should data with `Adm_Rate=0.2`, `Cost=40000`, and `Net_Tuition=10000` appear on the graphic?). 
+
+Scales can be modified by adding layers using functions whose names follow the general format: "scale_aesthetic_function()". Shown below are a few examples:
+
+```{r fig.show="hold", out.width="50%"}
+## Default Scales
+ggplot(data = colleges, mapping = aes(x = Cost, y = Net_Tuition, color = Adm_Rate)) +
+  geom_point()
+
+## Put cost (the "x" aesthetic) on the log2 scale
+ggplot(data = colleges, mapping = aes(x = Cost, y = Net_Tuition, color = Adm_Rate)) +
+  geom_point() +
+  scale_x_continuous(trans = "log2")
+```
+
+```{r fig.show="hold", out.width="50%"}
+## Use a gradient from purple to yellow to display Adm_Rate
+ggplot(data = colleges, mapping = aes(x = Cost, y = Net_Tuition, color = Adm_Rate)) +
+  geom_point() +
+  scale_color_gradient(low = "purple", high = "yellow")
+
+## Use the popular "viridis" color scale, reversing the default direction via "-1"
+ggplot(data = colleges, mapping = aes(x = Cost, y = Net_Tuition, color = Adm_Rate)) +
+  geom_point() +
+  scale_color_continuous(type = "viridis", direction = -1)
+```
+
+There are two things you should note at this point:
+
+1. There are variants of scale functions depending upon the type of the variable being used by that aesthetic. In these examples, `scale_color_continuous()` is used because "Adm_Rate" is a continuous numeric variable. However, if colors were being determined by a character string you'd want to use `scale_color_brewer()` instead (or one of the related color scale functions designed for discrete variables).
+2. The *color aesthetic* is not synonymous with all of the color you see on the graph. For example, the `fill` aesthetic can be used to add color to a bar chart, and you must use a function like `scale_fill_brewer()` to change the fill color.
+
+**Question #5**: Create a 2-dimensional filled density plot (using `geom_density_2d_filled()`) with the aesthetics "x = Adm_Rate" and "y = Net_Tuition" using the "viridis" color scale and a "reverse" x-axis that goes from 1.00 to 0.00.  Then, write a sentence or two describing the combinations of admissions rate and net tuition that occur most frequently among US colleges.
+
+```{r, eval = FALSE, echo = FALSE}
+ggplot(data = colleges, mapping = aes(x = Adm_Rate, y = Net_Tuition)) +
+  geom_density_2d_filled() +
+  scale_x_continuous(trans = "reverse") +
+  scale_color_continuous(type = "viridis")
+```
+
+$~$
+
+### Stats
+
+Sometimes we'd like to display a statistical transformation (mean, error bars, etc.) alongside the data itself. While this could be accomplished by creating a separate data frame, it's generally better to use a `stat_` function:
+
+```{r, warning = FALSE, message = FALSE}
+ggplot(data = colleges[1:30,], mapping = aes(x = Net_Tuition, y = Private)) +
+  geom_point() + 
+  stat_summary(fun = mean, geom = "point", color = "red", size = 3) +
+  stat_summary(fun.data = mean_se, geom = "errorbar", color = "red")
+```
+
+The example above adds error bars at 1 standard error above and below the mean net tuition cost of for the private and public colleges in the first 30 rows of the `colleges` data frame.
+
+Notice how the first instance of `stat_summary()` uses the `fun` argument (a simple option designed to return a single number/vector), while the second uses the `fun.data` argument (a complex option designed to return a data frame, which contains the lower and upper endpoints of the interval in this example).
+
+**Question #6**: Using the data subset containing only colleges located in Iowa (you created this in Question #4), create a graph similar to the example above but using the arguments `geom = "linerange"`, `alpha = 0.3`, `size = 4`, and `color = "red"` to depict 1 standard error above/below the means of private and public colleges.
+
+```{r, eval = FALSE, echo = FALSE}
+ggplot(data = iowa_colleges,  mapping = aes(x = Net_Tuition, y = Private)) +
+  geom_point() + 
+  stat_summary(fun.data = mean_se, geom = "linerange", color = "red", alpha = 0.3, size = 4)
+```
+
+$~$
+
+### Facets
+
+Relying on large numbers of aesthetics to include additional variables on a graph can quickly become overwhelming. Facets allow you to display multiple side-by-side graphs according to one or more categorical variables.
+
+- `facet_wrap()` is designed to display the data broken by a single categorical variable
+- `facet_grid()` is designed to display the data broken by all combinations of two categorical variables
+
+Two examples of faceting are shown below:
+
+```{r}
+## create a subset for example purposes
+reduced_colleges = subset(colleges, Region %in% c("Great Lakes", "Far West", "Plains"))
+
+## facet_wrap
+ggplot(data = reduced_colleges, mapping = aes(x = Cost)) +
+  geom_density() +
+  facet_wrap(~Region, nrow = 1)
+
+## facet_grid
+ggplot(data = reduced_colleges, mapping = aes(x = Cost)) +
+  geom_density() +
+  facet_grid(Private~Region)
+```
+
+The `facet_wrap()` function will wrap a series of plots according to a fixed number of rows or columns, while `facet_grid()` will construct a 2-dimensional grid whose panels correspond to the unique combinations of values in the variables used in the grid formula.
+
+$~$
+
+### Practice
+
+The code below will load a data set containing 970 Hollywood films released between 2007 and 2011, then reduce these data to only include variables that could be known prior to a film's opening weekend. The data are then simplified further to only include the four largest studios (Warner Bros, Fox, Paramount, and Universal) in the three most common genres (action, comedy, drama). You will use the resulting data (ie: `movies_subset`) for Question #7.
+
+```{r}
+movies = read.csv("https://remiller1450.github.io/data/HollywoodMovies.csv")
+movies_subset = subset(movies, LeadStudio %in% c("Warner Bros", "Fox", "Paramount", "Universal") & 
+                               Genre %in% c("Action", "Comedy", "Drama"),
+                       select = c("Movie", "LeadStudio", "Story", "Genre","Budget",
+                                  "TheatersOpenWeek","Year","OpeningWeekend"))
+```
+
+**Question #7**: Create a graphic that shows the relationship between the outcome variable "OpeningWeekend" and the explanatory variables: "Budget", "Genre", and "Studio" that satisfies the following requirements:
+
+1. It uses a non-default theme.
+2. It changes the label of at least one variable to make it appear more professional (for example, add a space so that your graph shows "Opening Weekend" instead of "OpeningWeekend") 
+3. It uses the color aesthetic in some capacity, and it uses a non-default color scale.
+
+```{r, echo = FALSE, eval = FALSE}
+ggplot(movies_subset, aes(x = Budget, y = OpeningWeekend, col = LeadStudio)) + geom_point() + facet_grid(~Genre) + labs(color = "Lead Studio") + scale_colour_brewer(palette = "Dark2")
+```
