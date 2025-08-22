@@ -1,0 +1,444 @@
+---
+title: "String Processing with `stringr`"
+output:
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: true
+      smooth_scroll: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.height = 3)
+```
+
+This lab focuses on manipulating characters strings using the `stringr` package within the [tidyverse suite](https://www.tidyverse.org/packages/).
+
+```{r message = FALSE, warning = FALSE}
+# Please install and load the following packages
+# install.packages("stringr")
+library(stringr)
+library(ggplot2)
+```
+
+**Directions** (Please read before starting)
+
+1) Please *work together* with your assigned partner. Make sure you both fully understand each concept before you move on.
+2) Please record your answers and any related code for all embedded lab questions. I encourage you to try out the embedded examples, but you shouldn't turn them in.
+3) Please ask for help, clarification, or even just a check-in if anything seems unclear.
+
+$~$
+
+## Preamble
+
+### String basics
+
+A "string" is a single element of a character variable (vector), or a stand alone collection of characters enclosed by quotes.
+
+```{r}
+x <- "Single Element String"
+y <- c("apple", "banana", "pear")  ## strings within a character vector
+```
+
+There are many similarities between strings and other types of data. For example, the individual characters in a string have their own positions, and strings have their own length:
+
+```{r, results = "hold"}
+str_length(x)
+str_length(y)
+length(y)
+```
+
+Positional indices are important to many string processing functions, such as `str_sub()`:
+
+```{r, results = "hold"}
+str_sub(x, start = 1, end = 4)  ## str_sub() will subset a string
+str_sub(y, start = 1, end = 4)
+```
+
+Positions can also be referenced from the end of a string using negative numbers:
+
+```{r, results = "hold"}
+str_sub(x, start = -4, end = -1)
+str_sub(y, start = -2, end = -1)
+```
+
+$~$
+
+### Strings and other data types
+
+The presence of a character string within a vector will *dominate* all other types of data:
+
+```{r, results = "hold"}
+x1 <- c(1, 2, 3)
+typeof(x1)
+
+x2 <- c(1, 2, 3, "A")
+typeof(x2)
+```
+
+```{r, results = "hold"}
+y1 <- c(TRUE, FALSE)
+typeof(y1)
+
+y2 <- c(TRUE, FALSE, "A")
+typeof(y2)
+```
+
+This can be a problem if your raw data used character strings to represent missing data or footnotes:
+
+```{r}
+my_data <- read.csv("https://remiller1450.github.io/data/char_dom.csv")
+head(my_data)
+str(my_data)
+```
+
+Fortunately, "messy_x" can be fixed using `as.numeric()`, and "messy_y" can be fixed using the `parse_number()` function in the `readr` package:
+
+```{r}
+## Coerce x to numeric
+as.numeric(my_data$messy_x)
+
+## Extract only the numeric values in y
+library(readr)
+parse_number(my_data$messy_y)
+```
+
+$~$
+
+## Lab
+
+At this point you should begin working with your partner. Please read through the text/examples and make sure you both understand before attempting to answer the embedded questions.
+
+$~$
+
+### Workhorse Functions
+
+The `stringr` package contains dozens of string processing tools. We will focus our attention on the following functions:
+
+Function | Description
+--------|---------------------------------------------------------
+`str_sub()` | Extract substring from a given start to end position
+`str_detect()` |Detect presence/absence of first occurrence of substring 
+`str_locate()` | Give position (start, end) of first occurrence of substring
+`str_locate_all()`|Give positions of all occurrences of a substring 
+`str_replace()` | Replace the first instance of a substring with another
+`str_replace_all()` | Replace all instances of a substring with another
+
+For illustration purposes, we will use the vector created below:
+
+```{r}
+fruits <- c("Apple", "Pineapple", "Pear", "Orange", "Peach", "Banana")
+```
+
+**String Detect**:
+
+`str_detect()` returns `TRUE` or `FALSE` for each element in character vector depending upon whether it contains the target pattern:
+
+```{r}
+str_detect(fruits, "ap") ## returns TRUE if "ap" is found 
+```
+
+Because strings are case-sensitive, `"ap"` is *not found* in `"Apple"`, but *is found* in `"Pineapple"`.
+
+**String Locate**:
+
+`str_locate()` returns the start and end positions of the first instance of the target pattern:
+
+```{r}
+str_locate(fruits, "an")
+```
+
+Notice the sixth fruit, `"banana"`, has two instances of `"an"`, but only the first is considered.
+
+`str_locate_all()` can be used to find every instance of a target pattern, but it can be more cumbersome to work with because its output is a list object (rather than the matrix returned by `str_locate()`):
+
+```{r}
+str_locate_all(fruits, "an")
+```
+
+A common goal might be to count the instances of a pattern, in which case the `unlist()` function can be used to coerce the list into a vector.
+
+```{r}
+out <- str_locate_all(fruits, "an")
+v <- unlist(out) ## coerce the list into a vector
+length(v)/2  ## total number of times "an" occurs in "fruits"
+```
+
+**String Replace**:
+
+`str_replace()` will replace the target pattern with another expression:
+
+```{r}
+str_replace(fruits, "an", "XX")
+```
+
+Similar to `str_locate()` it also works only on the first instance of the pattern, but `str_replace_all()` can be used if every instance should be replaced:
+
+```{r}
+str_replace_all(fruits, "an", "XX")
+```
+
+**Question #1**: Using appropriate `stringr` functions, identify which elements in the vector "fruits" contain a lower case "p". Then, use the `which()` function and indices to print these fruits.
+
+**Question #2**: Using appropriate `stringr` functions,  count the *total number* of times a lower case "p" occurs in the vector "fruits".
+
+$~$
+
+### Pre-processing
+
+With strings it can beneficial to pre-process your data to simplify later operations. For example, you might convert all of your strings to lower case via the `str_to_lower()` function:
+
+```{r}
+str_to_lower(fruits)
+```
+
+Similar functions exist for converting to upper, title, or sentence case:
+
+```{r}
+str_to_upper(fruits)
+str_to_title(fruits)
+str_to_sentence("aPPles AND Bananas are THE Most popular FRUits")
+```
+
+Another common problem in string processing is the presence of white space, such as excessive spacing between characters, or at the beginning and end of strings. 
+
+The `string_squish()` function will eliminate all leading and trailing white space and reduce any repeated spaces inside the body of the string to a single instance:
+
+```{r}
+str_squish("  String     A ")
+```
+
+If you wish to remove leading/trailing spaces without modifying the body of the string you can do so using the `string_trim()` function:
+
+```{r}
+str_trim("  String     A ")
+```
+
+**Question #3**: Beginning with the character string given below, use the functions `str_squish()`, `str_to_title()`, and `str_replace_all()` to produce the string `"United_States"`.
+
+```{r}
+q3 <- c("  UNITED  STATES  ")
+```
+
+```{r, eval = FALSE, echo = FALSE}
+q3 <- str_squish(q3)
+q3 <- str_to_title(q3)
+str_replace_all(q3, " ", "_")
+```
+
+$~$
+
+### Regular Expressions
+
+*Regular expressions*, or "regex", are special sequences of characters used to identify patterns in strings. At its simplest, a regular expression might look exactly like the pattern you're trying to find. For example `"ea"` will match the `"ea"` in `"pear"`.
+
+From here, we can increase the flexibility of the expression using `.`, sometimes called a *wildcard*, which can match *any character*. 
+
+To understand the wildcard, consider searching for `".a."` in `y = c("apple", "banana", "pear")`:
+
+```{r, echo = FALSE}
+y = c("apple", "banana", "pear")
+str_view_all(y, pattern = ".a.")
+```
+
+The patterns matching `".a."` are highlighted above. Notice how each match has the character "a" surrounded by exactly one character on both sides, but the exact characters surrounding the "a" can be different.
+
+$~$
+
+### Anchoring
+
+By default, regex will match with any portion of a string, but it's sometimes useful to *anchor* an expression to only a match characters at either the start or end of a string.
+
+- `^` anchors matching to the start of a string
+- `$` anchors matching to at the end of a string
+
+```{r}
+fruits[str_detect(fruits, "e$")] ## Fruits ending in "e"
+fruits[str_detect(fruits, "^P")] ## Fruits starting with "P"
+```
+
+**Question #4**: Use the wildcard character, `.`, and anchoring to find all strings that start with "P", followed by any character, followed by "a".
+
+$~$
+
+### Repeated Characters
+
+The meta-characters, `*` and `+` can be used to match patterns with a flexible number of repeated characters.
+
+- `*` is used to match 0 or more instances of the preceding character
+- `+` is used to match 1 or more instances of the preceding character
+
+```{r, results = "hold"}
+fruits[str_detect(fruits, "ap*")] ## "a" followed by 0 or more instances of "p"
+fruits[str_detect(fruits, "ap+")] ## "a" followed by 1 or more occurrences of "p"
+```
+
+In these examples, the usefulness of `*` isn't obvious, but consider the following examples:
+
+```{r}
+strings <- c("good", "goood", "goooood", "gooooood!")
+str_detect(strings, "goo*d")  ## Handles
+
+fruits[str_detect(fruits, "^A.*e$")]  ## Fruits starting with "A", followed by 0 or more of any char, ending in "e"
+```
+**Question #5**: Suppose you want to detect variations of "good" with excessive o's, but you do not want to detect "god". Why won't the expression `"goo*d:` work for this aim? How can you modify it to address the problem?
+
+$~$
+
+### Other Meta-characters
+
+In addition to `.`, `*`, `+`, `^`, and `$`, other meta-characters include:
+
+- `[]` - indicates the literal interpretation of a character, or a limited set of exchangeable characters.
+    - `[Pp]` will match either "P" or "p"
+- `{}` - indicates a fixed number of repetitions of the preceding character(s).
+    - `[0-9]{2}` will match any two-digit number (ie: 01, 15, 78, etc.)
+- `\\` - an escape character used to match something that is a meta-character.
+    - `\\.` will match the character `.` (a period appearing in a string) 
+    - `\\\\` is needed to match the character `"\"` (because `\` is itself a special character)
+
+In addition to these meta-characters, there are some special pattern shortcuts that are worth knowing:
+
+- `\\d` will match any digit
+- `\\s` will match any white space (ie: a space, a tab, or a newline)
+- `[^abd]` will match anything character other than "a", "b" or "d". When used inside a square parentheses `^` operates differently (recall it's used in anchoring).
+- `()` can be used for organization and will not influence pattern matching.
+
+To illustrate these meta-characters, consider the task of extracting 10-digit phone numbers from text string data:
+
+```{r}
+phone_strings <- c("Home: 507-645-5489", 
+                   "Cell: 219.917.9871", 
+                   "My work phone is 507-202-2332", 
+                   "I don't have a phone")
+```
+
+- A valid US area code is 3 digits that start with a 2 or higher. In regex, this can be expressed as `[2-9]\\d{2}`
+- The area code is separated from remaining digits using a `.` or `-`. So, we now have `[2-9]\\d{2}[-.]`
+- Finally, the phone number should 3 digits, followed by a `.` or `-`, then 4 more digits, making the full expression `[2-9]\\d{2}[-.]\\d{3}[-.]\\d{4}`
+
+```{r}
+phone_pattern = "[2-9]\\d{2}[-.]\\d{3}[-.]\\d{4}"
+str_detect(phone_strings, phone_pattern)   ## Identify strings with matches
+str_extract(phone_strings, phone_pattern)  ## Extract the matches
+```
+
+It's also possible to use `stringr` functions to help make sensitive information anonymous:
+
+```{r}
+str_replace(phone_strings, phone_pattern, "XXX-XXX-XXXX")
+```
+
+$~$
+
+### Matching Brackets and HTML Tags
+
+In some circumstances you might want to use regex to identify brackets, such as [8] or (8), or html tags, such as `<tag>`.
+
+Consider the following character strings:
+
+```{r}
+out <- c("abc[8]", "abc[9][20]", "abc[9]def[10][7]", "abc[]")
+```
+
+The regex pattern `"\\[([^]]*)\\]"` will produce the following matches:
+
+```{r, echo = FALSE}
+str_view_all(out, pattern = "\\[([^]]*)\\]")
+```
+
+The regex pattern `"\\[(.*)\\]"` will produce the following:
+
+```{r, echo = FALSE}
+str_view_all(out, "\\[(.*)\\]")
+```
+
+Notice how `[^]]` is necessary to match any character besides a the right bracket `]`.
+
+**Question #6**: Some people might choose to wrap the area code of their phone number in `( )`. Modify the regular expression provided above so that it will successfully match phone numbers whose area codes use this syntax. Then, use `string_extract()` to extract the valid phone numbers and `string_replace()` convert them to a uniform style including only numbers and dashes (`-`).
+
+```{r}
+phone_strings <- c("Home: (507)-645-5489", 
+                   "Cell: 219.917.9871", 
+                   "My work phone is 507-202-2332",
+                   "I don't have a phone")
+```
+
+```{r, echo = FALSE, eval = FALSE}
+phone_pattern = "\\(*[2-9]\\d{2}\\)*[-.]\\d{3}[-.]\\d{4}"  ## New pattern
+matches <- str_extract(phone_strings, phone_pattern)       ## Initial matches
+cleaned_phones <- str_replace_all(matches, "[\\(\\)]", "") ## Remove ( )
+str_replace_all(cleaned_phones, "\\.", "-")                ## Replace .
+```
+
+$~$
+
+### Practice (required)
+
+The data below comes from a real driving simulator experiment. The "disposition" file records the experimental participants, their assigned conditions, and the driving simulator output files that record a time-series of driver/vehicle inputs in a particular simulated drive. Output from the simulator are stored as DAQ file.
+
+```{r}
+disp = read.csv("https://remiller1450.github.io/data/disposition.csv")
+head(disp)
+```
+
+- The columns "Analyze", "Reduced", "Ignore" and "Discard" record how the researchers intend to handle certain DAQ files. Often problems arise during a simulated drive that prevent it from being useable. Only files with an "X" for reduced should be analyzed.
+- The column "DaqPath" contains information about the driver, including:
+    - Their group, either "Control", "Occasional", or "Frequent"
+    - Their subject ID, a prefix of C/O/F followed by a three-digit number
+    - Their experimental condition, either "PRE" for pre-dosing, or "POST" for post-dosing
+- The column "DaqName" contains information about the drive, including:
+    - The drive scenario, in this disposition file the two scenarios are "RuralRedLight" and "RedLight"
+    - The order in which the participant experienced the stated scenario. For example, "1" means this was the first of four drives by that subject, "2" means it was the second of four drives by that subject, etc.
+    - A time stamp for when the DAQ was recorded. For example, the first row's DAQ was record on Sept 5th, 2018. The numbers following the date are specific to the simulator's internal clock and generally not meaningful.
+    
+**Question #7**:  Exclude any drives that do not have an "X" in the reduced column. Then, using `stringr` functions as appropriate, process the information recorded in "disposition.csv" into a data frame with the following columns:
+
+1. "Group" - either "Control", "Occasional", or "Frequent"
+2. "SubjectID" - a string starting with "C"," "O", or "F" followed by an underscore and a 3-digit numeric identifier
+3. "Treatment" - either "PRE" or "POST"
+4. "Scenario" - either "RuralRedLight" or "RedLight"
+5. "DriveNumber" - an integer between 1 and 4 indicating the ordering of the drive
+
+*Hints*:
+
+- Remember that the expression `\\\\` is needed to match a single `\`
+- You may be find the expression `_[^\\d]*$` useful. Think about what it will will match.
+- I recommend creating each constituent vector separately, then using `data.frame` to assemble them into a data frame.
+
+Printed below are the first 10 rows of the target data.frame in the requested format.
+
+
+```{r, echo=TRUE, eval=FALSE}
+### Clean and efficient soln
+
+dplyr::filter(disp, Reduced == "X") %>% 
+  separate(DaqPath, into = c("Group", "Remainder"), sep = "\\\\") %>%                                               # Split off "Group"
+  mutate(SubjectID =  str_extract(Remainder, pattern = ".*\\d{3}")) %>%                                             # Extract Subject ID
+  mutate(Treatment = str_extract(Remainder, pattern =  "_[^\\d]*$") %>% str_replace_all(pattern = "_", replacement = "")) %>%  # Get Trt then clean up
+  separate(DaqName, into = c("DriveNumber", "Scenario", "Extra"), sep = "\\_") %>%                                  # Split DaqName
+  select(Group, SubjectID, Treatment, Scenario, DriveNumber)                                                        # Keep only the needed variables
+```
+
+```{r, echo = FALSE}
+### Alternate soln  (using data.frame construction approach)
+disp = dplyr::filter(disp, Reduced == "X")
+
+group = str_extract(string = disp$DaqPath,  pattern = "(.*)\\\\") %>% 
+  str_replace(pattern = "\\\\", replacement = "")
+subjs = str_extract(string = disp$DaqPath,  pattern = "\\\\(.+)") %>% 
+  str_replace(pattern = "\\\\", replacement = "") %>% str_replace(pattern = "_[^\\d]*$", replacement = "")
+treatment = str_extract(string = disp$DaqPath,  pattern = "_[^\\d]*$") %>% 
+  str_replace_all(pattern = "_", replacement = "")
+scenario = str_replace_all(disp$DaqName, pattern = ".daq", replacement = "") %>% str_extract(pattern = "_.*_") %>% str_replace_all(pattern = "_", replacement = "")
+drivenumber = str_sub(disp$DaqName, 1,1)
+
+df = data.frame(Group = group,
+           SubjectID = subjs,
+           Treatment = treatment,
+           Scenario = scenario,
+           DriveNumber = drivenumber)
+
+head(df, 10)
+```
+

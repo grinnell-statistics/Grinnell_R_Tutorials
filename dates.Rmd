@@ -1,0 +1,328 @@
+---
+title: "Dates and Times with `lubridate`"
+output:
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: true
+      smooth_scroll: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.height = 3)
+```
+
+This lab will cover select functions in the `lubridate` package that are useful in working with dates and times:
+
+```{r message = FALSE, warning = FALSE}
+library(lubridate)
+library(dplyr)
+library(ggplot2)
+```
+
+**Directions** (Please read before starting)
+
+1) Please *work together* with your assigned partner. Make sure you both fully understand each concept before you move on.
+2) Please record your answers and any related code for all embedded lab questions. I encourage you to try out the embedded examples, but you shouldn't turn them in.
+3) Please ask for help, clarification, or even just a check-in if anything seems unclear.
+
+$~$
+
+## Preamble
+
+Suppose you wanted to calculate the number of days that have elapsed between Dec 12th 2019 and today. You could get today's date in `R` using the `Sys.Date()` function:
+
+```{r}
+todays_date = Sys.Date()
+print(todays_date)
+```
+While this looks like a character string, we can use the `class()` function to see that "today" is an object of class "Date":
+
+```{r}
+class(todays_date)
+```
+Operations involving a mixture of Date and character types are not allowed, but arithmetic operations can be applied to two Date objects:
+
+```{r, eval = FALSE}
+todays_date - "2019-12-12"           ## Causes an error
+todays_date - as.Date("2019-12-12")  ## Works as intended
+```
+
+You might note that dates can be coerced into numeric, with "day 0" being Jan 1, 1970:
+
+```{r, results = "hold"}
+as.numeric(todays_date) - as.numeric(as.Date("2019-12-12"))
+as.numeric(as.Date("1970-01-01"))
+```
+`R` is set up to store dates internally as the number of days passed since Jan 1, 1970.
+
+
+$~$
+
+### Date classes
+
+The default storage mode for dates in `R` is [ISO 8610](https://en.wikipedia.org/wiki/ISO_8601), which uses a format of `yyyy-mm-dd` (and `hh:mm:ss` if time is known). 
+
+The `lubridate` package, which offers vastly improved handling of dates uses a different storage mode.We can use the `now()` function in the `lubridate` package to retrieve the current date/time (to the nearest second):
+
+```{r}
+right_now = now()
+print(right_now)
+```
+
+Notice the class of "right_now":
+
+```{r}
+class(right_now)
+```
+The "POSIXct" class records date/time information with an associated time zone. "POSIX" is an acronym for "Portable Operating System Interface" and "ct" stands for "calender time", while "t" stands for "text" (POSIXt is a mixed character and date format)
+
+A benefit of the "POSIXct" class is its handling of time zones:
+
+```{r}
+as.POSIXct("05/24/2017 08:45", format = "%m/%d/%Y %H:%M", tz = "America/Chicago") - 
+   as.POSIXct("05/24/2017 08:45", format = "%m/%d/%Y %H:%M", tz = "America/Denver")
+```
+You can access a full list of acceptable inputs to the `tz` argument using the command `OlsonNames(tzdir = NULL)`:
+
+```{r}
+head(OlsonNames(tzdir = NULL))
+```
+
+
+$~$
+
+## Lab
+
+At this point you should begin working with your partner. Please read through the text/examples and make sure you both understand before attempting to answer the embedded questions.
+
+$~$
+
+### Date Components
+
+As you'd expect, any date can be decomposed into its constituent components using the following functions:
+
+Component  |  Function
+-----------|--------------
+Year       |  `year()`
+Month      |  `month()`
+Day        |  `day()`
+Hour       |  `hour()`
+Minute     |  `minute()`
+Second     |  `second()`
+
+There is also a `milliseconds()` function, but it isn't broadly compatible with the standard date/time classes.
+
+Shown below are quick examples of these functions:
+
+```{r, results = "hold"}
+date1 = as.POSIXct("05/24/2017 08:45", format = "%m/%d/%Y %H:%M", tz = "America/Chicago")
+
+## Year
+year(date1)
+
+## Month
+month(date1)
+
+## Day
+day(date1)
+
+## Hour
+hour(date1)
+
+## Minute
+minute(date1)
+
+## Second
+second(date1)
+```
+
+You should be aware that there are a similarly named functions: `hours()`, $\ldots$, `seconds()`; however, these functions do not provide the same output as their singular counterparts:
+
+```{r}
+## Example of the "hours" function
+hours(date1)
+```
+**Question #1**: Compare the output of `days()` and `day()` when `date1` (defined in the examples above) is used as an input. What do you think is being returned by `days()`? Can you confirm this? *Hint*: Consider the information about how `R` stores dates given in the lab's preamble.
+
+$~$
+
+### Common Date Calculations
+
+The `lubridate` package also contains a handful of functions to help perform common date/time calculations:
+
+Function         |  Output
+-----------------|-----------------------------------------------------------------------------
+`yday()`         |  day of the year (number from 1-365)
+`wday()`         |  day of week (number from 1-7 or factor label when `label=TRUE` is used)
+`floor_date()`   |  rounds the date downward 
+`ceiling_date()` |  rounds the date upward
+`round_date()`   |  rounds the date upward/downward (whichever is closer)
+
+A few examples demonstrating these functions are given below:
+
+```{r, results = "hold"}
+## Day of year
+yday(date1)
+
+## Day of week
+wday(date1)
+wday(date1, label = TRUE)
+
+## Rounding
+floor_date(date1, unit = "month")
+ceiling_date(date1, unit = "month")
+round_date(date1, unit = "month")
+```
+**Question #2**: Use `as.POSIXct()` to create a date/time object representing 9:15pm in Los Angeles on February 14, 2020. Then, round this date to the nearest day and determine which day of the week the result is.
+
+```{r, echo = FALSE, eval = FALSE}
+date_q2 = as.POSIXct("02/14/2020 9:15", format = "%m/%d/%Y %H:%M", tz = "America/Los_Angeles")
+round_date(date_q2, unit = "day") %>% wday(label=TRUE)
+```
+
+$~$
+
+### Format Conversions
+
+Arguably the biggest challenge when working with dates/times is the multiplicity of formats that can arise. For example, the date "May 12, 2017" might get recorded as any of the following:
+
+- May 12, 2017
+- 5/12/2017
+- 05-12-2017
+- 2017-05-12
+- 20170512
+
+`lubridate` provides a collection of functions to standardize different date/time formats:
+
+Function         |  Expected Input Format
+-----------------|-----------------------------------------------------------------------------
+`mdy()`          |  Month - Day - Year
+`ymd()`          |  Year - Month - Day
+`dmy()`          |  Day - Month - Year
+`myd()`          |  Month - Year - Day
+
+Each of these is accompanied by a related function that incorperate time.  For example `mdy()` has the accompanying functions `mdy_h()`, `mdy_hm()`, and `mdy_hms()` depending upon whether the time component contains hours, hours and minutes, or hours and minutes and seconds.
+
+Show below are several examples:
+
+```{r, results = "hold"}
+## Examples 1-3 (mdy)
+mdy("May 12, 2017")
+mdy("5/12/2017")
+mdy("05-12-2017")
+```
+
+```{r, results = "hold"}
+## Examples 4-5 (ymd)
+ymd("2017-05-12")
+ymd("20170512")
+```
+
+```{r, results = "hold"}
+## Additional examples (w/out time)
+dmy("3rd May, 2019")
+myd("May 2019, the 30th")
+```
+
+```{r, results = "hold"}
+## Additional examples (w/ time)
+mdy_hm("May 12, 2017 4:45pm", tz = "America/Chicago")
+mdy_hms("05-12-2017 16:45:00", tz = "America/Chicago")
+```
+
+**Question #3**: On January 27th at 6:31 PM, the Apollo 1 spacecraft, planned to be the first manned mission of the Apollo space program, experienced a cabin fire on the landing pad in Cape Kennedy Air Force Station, Florida during a launch simulation, killing all three crew members on board. Nearly 19 years later, on January 28, 1986 at 11:39 AM, the Challenger Shuttle exploded just off the coast of Cape Canveral, Florida. Rounding each date to the nearest day, determine how many days passed between these two events.
+
+```{r}
+apollo <- "1967 Jan 27th at 6:31:19 PM UTC"
+challenger <- "28 January 1986, 1139am"
+```
+
+
+```{r, echo = FALSE, eval = FALSE}
+t1 <- ymd_hms(apollo)
+t2 <- dmy_hm(challenger)
+round_date(t1, unit = "day") - round_date(t2, unit = "day")
+```
+
+$~$
+
+### Times Without Dates
+
+Sometimes you'll encounter data consisting of times without an attached date. These could be times within a day such as "01:30:00" or 1:30 AM, but more commonly they'll be a duration of time such as 1 hour, 30 minutes, and 0 seconds.
+
+The `lubridate` package provides a simple storage class for times without dates via the `hms()` function. In the example below, this function is expressed using the namespace `lubridate` (ie: it is called using `lubridate::hms()`) because there is a different function named "hms" in the `hms` package that doesn't behave interchangeably.
+
+```{r}
+## Example
+time1 = lubridate::hms("01:10:00")
+60*hour(time1) + minute(time1)
+```
+
+Here, we create an `hms` object from the string "00:10:00", then we convert it to into minutes ourselves. 
+
+Because `hms` objects are stored as the number of seconds since `00:00:00`, we can perform arithmetic with them directly:
+
+```{r}
+lubridate::hms("01:10:00") - lubridate::hms("01:05:00")
+```
+
+We can also exploit this fact to easily convert results to seconds using pipelines:
+
+```{r}
+(lubridate::hms("01:10:00") - lubridate::hms("01:05:00")) %>% seconds()
+```
+
+$~$
+
+### Practice (required)
+
+**Question #4**: The [2015 Boston Marathon](https://en.wikipedia.org/wiki/2015_Boston_Marathon) took place on April 20th, 2015. It was the 119th running of one of the world's most well-known races. The data below contain information, results, and splits for each finisher:
+
+```{r}
+marathon = read.csv("https://remiller1450.github.io/data/BostonMarathon2015.csv")
+```
+
+**Part A**: A marathon is approximately 26.2 miles, making the first half 13.1 miles. Using this information, calculate the per mile pace (in seconds) for each participant in the *first half of the race*. Be sure to store your results.
+
+**Part B**: Now calculate the pace per mile in the *second half of the race*. Be sure to store your results.
+
+**Part C**: Now create a scatterplot displaying the relationship between pace per mile in the first half of the race vs. pace per mile in the second half of the race by age and sex. To facilitate this, you should assemble your results from Parts A and B into a data frame that also includes the "Age" and "M.F" columns from the original data. A target graphic is given below. *Note*: `scale_x_time()` and `scale_y_time()` can be used to display your first half and second half paces on a time scale. The graph shown below uses the argument `alpha = 0.2` to reduce the impact of over-plotting, and a 45-degree line is added using `geom_abline()`.
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+## PART A
+first_pace = lubridate::hms(marathon$Half) %>% seconds() / 13.1
+
+## PART B
+second_pace = (lubridate::hms(marathon$Official.Time) - lubridate::hms(marathon$Half)) %>% seconds() / 13.1
+
+## Part C
+plot_df = data.frame(Age = marathon$Age, Sex = marathon$M.F, first_pace = first_pace, second_pace = second_pace)
+
+ggplot(plot_df, aes(x = first_pace, y = second_pace, color = Age)) + geom_point(alpha = 0.2) + facet_wrap(~Sex) +
+  scale_x_time() + scale_y_time() + geom_abline(intercept = 0, slope = 1, linetype = "dashed") + theme_light() + labs(x = "First Half Pace per Mile", y = "Second Half Pace per Mile")
+```
+
+$~$
+
+### Practice (optional, for extra credit)
+
+**Question #5**: The two CSV files below contain results from a real experiment on cannabis impaired driving conducted in an advanced driving simulator. The file "startdose.csv" is a list of participant IDs and the time at which each began a 10-min *ad libitum* dose of inhaled cannabis, and the file "high_effects.csv" records each participant's self-reported feelings of "high" (on a 0-100 scale) at various points throughout the experiment.
+
+```{r}
+dose = read.csv("https://remiller1450.github.io/data/startdose.csv")
+high = read.csv("https://remiller1450.github.io/data/high_effects.csv")
+```
+
+Your task in this question is to recreate the visualization below:
+
+```{r, warning = FALSE, message = FALSE, echo = FALSE}
+dose$Subject = as.character(dose$SubjectID)
+res = left_join(high, dose, by = "Subject") %>% mutate(diff = mdy_hm(Time.1, tz = "America/Chicago") - 
+                                                              mdy_hm(Start, tz = "America/Chicago") ) %>%  filter(Time != 1)
+
+ggplot(res, aes(x = diff, y = High, color = Subject, group = Subject)) + geom_line() + geom_point() + guides(color = "none") + 
+  labs(x = "Minutes after dosing", y = "Self-reported High") + scale_x_continuous(breaks = seq(20,190, by = 15)) + theme_minimal()
+```
+
+
