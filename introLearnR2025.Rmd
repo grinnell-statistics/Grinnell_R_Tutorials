@@ -1,0 +1,444 @@
+---
+title: "Lab #1A - Introduction to R"
+output:
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+runtime: shiny_prerendered
+description: "This lab provides a very brief introduction to `RStudio`, its user interface, some basic `R` programming, as well as a publishing extension known as `RMarkdown`."
+
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+library(dplyr)
+x <- 1:3 # The sequence {1, 2, 3} is assigned to the vector called 'x'
+y <- c(1,2,3) # The function 'c' concatenates arguments (separated by commas) into a vector
+z <- c("A","B","C") # Vectors can contain many types of values
+DF <- data.frame(A = x, B = y, C = z)
+my.data <- read.csv("https://raw.githubusercontent.com/skuiper/GrinnellDataScience/master/data/IowaCityHomeSales.csv")
+BigHouseData <- my.data %>%
+  filter(bedrooms > 2)
+```
+
+
+
+
+## Getting Started
+
+This online tutorial is designed to introduce people to R and RStudio. In this tutorial, you can edit and execute R code and see the results within your browser. In R, text and coding are often separated. The places where we type our code are called **Code Chunks**.
+
+This is primarily meant as a space for people to work at their own speed to practice and build an understanding of the basics of R.
+
+
+
+### Using R as a Calculator
+
+At its most basic level, `R` can be used to perform arithmetic operations. A few examples are shown below, try hitting the "run code" button to execute the following commands on your own.
+
+```{r arithmetic1, exercise = TRUE}
+5 + 1 - 2
+```
+
+```{r arithmetic2, exercise = TRUE}
+5 ^ 2 + 2 * 2
+```
+
+
+As with many calculators, the operators are + for addition, - for subtraction, * for multiplication, / for division and ^ for exponentiation. Often parentheses are used to clarify the order of operations.
+
+Some arithmetic operations require the use of *functions*.  In the example below, the function "exp" raises the number $e$ to the power that is input into the function.  The input is given in parentheses. In this example, the number 2 is input into the function "exp":
+
+```{r arithmetic3, exercise = TRUE}
+exp(2)
+```
+
+This function takes the square root:
+
+```{r arithmetic4, exercise = TRUE}
+sqrt(4)
+```
+
+This function takes the absolute value:
+
+```{r arithmetic5, exercise = TRUE}
+abs(-3)
+```
+
+A nice aspect of R is the documentation of several functions. For example, if you have questions about taking the log of a number you can type `?sqrt` into the line of code.
+
+**Question #1**  What happens if you type `log(exp(2))` or  `(5 ^ 2 + 2) * 2` into the above line of code?
+
+$~$
+
+### Help Documentation
+
+You'll eventually end up memorizing the arguments of common `R` functions; however, while you're learning I strongly encourage you to read the *help documentation* for any `R` function used in your code. You can access a function's documentation by typing a `?` in front of the function name and submitting to the console.
+
+```{r, eval = FALSE}
+?log
+```
+
+$~$
+
+### Adding Comments
+
+When coding, it is good practice to include comments that describe what your code is doing. In `R` the character "#" is used to start a comment.  Everything appearing on the same line to the right of the "#" will not be executed when that line is submitted to the *console*.
+
+```{r}
+# This entire line is a comment and will do nothing if run
+```
+
+```{r}
+1:6 # The command "1:6" appears before this comment
+```
+
+$~$
+
+## Loading Data
+
+An important part of data science is *reproducibility*, or the ability for two people to independently replicate the results of a project.
+
+To ensure reproducibility, every data analysis should begin by importing raw data into `R` and manipulating it used documented (commented) code. Further, the raw data should be imported using functions, such as `read.csv`, instead of the point and click interface provided by the "Import Dataset" button (at the top of the environment pane).
+
+Below are two different examples:
+
+```{r, eval = FALSE}
+## Loading a CSV file from a web URL (storing it as "my.data")
+my.data <- read.csv("https://some_webpage/some_data.csv")
+```
+
+```{r, eval = FALSE}
+## Loading a CSV file with a local file path
+my.data <- read.csv("H:/path_to_my.data/my.data.csv")
+```
+
+A few things to note.
+
+1) Both `<-` or `=` can be used to *assign* something to a named object. The `<-` operator will create the object globally, while `=` will create the object locally in the environment where it was used. For the purposes of this course, we can use the two interchangeably since our code will "live" in the global environment.
+2) File paths must use  `/` or `\\`. A single `\` is used by `R` to start an instance of a special text character. For example, `\n` creates a new line in a string of text.
+3) `R` is case sensitive, meaning the lower case 'x' is a different object than the upper case 'X'.
+
+**Question #2**: Add code to your script that uses the `read.csv()` function to create an object named `my.data` that contains the "Iowa City Home Sales" data stored at: https://raw.githubusercontent.com/skuiper/GrinnellDataScience/master/data/IowaCityHomeSales.csv.
+
+Type in the `head(my.data)` and `dim(my.data). What does each command do?
+
+```{r Q2, exercise = TRUE}
+# Use read.csv() to load the data from:
+my.data <- read.csv("https://raw.githubusercontent.com/skuiper/GrinnellDataScience/master/data/IowaCityHomeSales.csv")
+```
+
+$~$
+
+## Objects and Assignments
+
+`R` stores data in containers called *objects*. Data is *assigned* into an object using `<-` or `=`. After assignment, data can be referenced using the object's name. The simplest objects are *scalars*, or a single *elements*:
+
+```{r}
+x <- 5 # This assigns the integer value '5' to an object called 'x'
+x^2    # We can now reference 'x'
+```
+
+`R` stores sequences of elements in objects called *vectors*:
+
+```{r}
+x <- 1:3 # The sequence {1, 2, 3} is assigned to the vector called 'x'
+print(x)
+y <- c(1,2,3) # The function 'c' concatenates arguments (separated by commas) into a vector
+print(y)
+z <- c("A","B","C") # Vectors can contain many types of values
+print(z)
+```
+
+The three most important *types* of vectors are:
+
+1) *numeric vectors* - for example: `x = c(1,2,3)`
+2) *character vectors* - for example: `x = c("A","B","C")`
+3) *logical vectors* - for example: `x = c(TRUE, FALSE, TRUE)`
+
+You should always consider a vector's type before using it. Many functions expect specific input types and will produce an error if the wrong type is used.  You can check the type of an object using the `typeof()` function:
+
+```{r}
+chars <- c("1","2","3") # Create a character vector
+typeof(chars)
+
+nums <- c(1,2,3) # Create a numeric vector
+typeof(nums)
+
+mean(chars) # This produces an error, mean() only works for numeric vectors
+mean(nums) # This works as intended
+```
+
+Certain `R` functions are *vectorized*, meaning they can accept a scalar input, for example `1`, and return the scalar output `f(1)`, or they can accept a vector input, such as `c(1,2,3)`, and return the vector `c(f(1),f(2),f(3))`. For example, `sqrt()` is vectorized:
+
+```{r}
+nums <- c(1,2,3,4)
+sqrt(nums)
+```
+
+Data are usually stored in objects called *data.frames*, which are composed of several vectors of the same length:
+
+```{r}
+DF <- data.frame(A = x, B = y, C = z) # Creates a data.frame object 'DF'
+print(DF)
+```
+
+Functions like `read.csv()` will automatically store their output as a data frame:
+
+```{r}
+my.data <- read.csv("https://raw.githubusercontent.com/skuiper/GrinnellDataScience/master/data/IowaCityHomeSales.csv")
+typeof(my.data)
+```
+
+However, notice `typeof()` describes `my.data` as a *list* object. Lists are a flexible class of objects whose elements can be of any type. A data frame is a special case of a list. 
+
+
+**Question #3**: Create a data frame named `my_DF` containing two vectors, $Names$ and $Grades$, where $J$ is contains 5 names and $K$ are grades (A - F). Make sure you print my_DF to verify you have correctly created the data frame.
+
+```{r Q3, exercise = TRUE}
+J <- c("John", "Jo", "Jerry", "Jan", "Jeff" )
+K <- c("A", "D","B","A-","C")
+
+```
+
+
+
+$~$
+
+
+## Indexing
+
+Suppose we have a vector "x" and would like to extract the element in its second position and assign it to a new object called "b":
+
+```{r}
+x <- 5:10
+b <- x[2]
+x
+b
+```
+
+The square brackets, `[` and `]`, are used to *access* a certain position (or multiple positions) within an object. In this example we access the second position of the object "x".
+
+Some objects, such as data frames, have multiple dimensions, requiring indices in each dimension (separated by commas) to describe a single element. A few examples are shown below:
+
+```{r}
+DF <- data.frame(x = x, y = y, z = z) 
+DF[2,3] # The element in row 2, column 3
+DF[2,] # Everything in row 2
+```
+
+For list objects, double square brackets, `[[`, are used to access positions within the list:
+
+```{r eval=FALSE}
+my_list[[2]] ## The 2nd component of the list
+```
+
+
+
+
+$~$
+
+## Working with Data
+
+Suppose we want to access a single variable from a data set, there are a few different ways we can do so:
+
+```{r}
+# The $ accesses the component named 'Country' within 'my.data'
+Price <- my.data$sale.amount  
+mean(Price)
+
+# Position indexing to access the variable 'Country' (since its the first column)
+Price2 <- my.data[,1] 
+mean(Price2)
+
+# Use the name of the variable in place of an index position
+Price3 <- my.data[,'sale.amount']
+mean(Price3)
+```
+
+Suppose we want to access a single observation (data point) in our dataset:
+
+```{r}
+House1 <- my.data[1,] # This stores the entire first row
+House1
+```
+
+Suppose we want a range of observations:
+
+```{r}
+FirstFive <- my.data[1:5,] # This stores the first five rows
+FirstFive
+```
+
+The `head` function prints the first few rows and variables of an object. Here are a few other functions might use when working with a new data set:
+
+```{r}
+names(my.data) # prints the column names of 'my.data'
+dim(my.data) # prints the dimensions of 'my.data'
+nrow(my.data) # prints the number of rows of 'my.data'
+ncol(my.data) # prints the number of columns of 'my.data'
+colnames(my.data) # prints the names of the variables (columns) of 'my.data'
+```
+
+**Question #4**: Use indices to print the third row of the housing data. How many bedrooms are in this house?
+
+```{r Q4, exercise = TRUE}
+
+```
+
+
+
+$~$
+
+## Logical Conditions and Subsetting
+
+Often we want to access all data that meet certain criteria. For example, we may want to analyze all countries with a life expectancy above 80. To accomplish this, we'll need to use logical operators:
+
+```{r, eval = FALSE}
+## This returns a logical vector using the condition "> 80"
+my.data$bedrooms > 2
+```
+
+A few logical operators you should know of are:
+
+Operator | Description 
+---------|-------------
+`==`     | equal to
+`!=` | not equal to
+`>` | great than 
+`>=` | greater than or equal to 
+`< `| less than
+`<= `| less than or equal to
+`& `| and
+`| `| or  
+`! ` | negation ("not") 
+
+We are often interested in a subset of our data, we can use the `filter` command to select certain rows in our dataset.
+
+The code below also introduces a **pipe operator**, `|>`. Each time you see it, read it as “and then”.
+
+
+```{r, eval = FALSE}
+## This returns a new dataset where the condition evaluated to TRUE
+dim(my.data)
+
+BigHouseData <- my.data %>%  # Make a new data frame, BigHouseData. Start with my.data "and then"
+  filter(bedrooms > 2)       # restrict the data frame to rows with more than 2 bedrooms
+
+dim(BigHouseData)
+mean(BigHouseData$sale.amount)
+
+```
+
+
+We can also use the `and` or `or` operators to create more specific filters:
+
+```{r}
+## Example #2
+Ex2 <- my.data %>%
+  filter(bedrooms > 2 & bsmt == "Full")
+
+dim(Ex2)
+mean(Ex2$sale.amount)
+
+```
+
+In example #2, the `&` operator is used to create a data frame, `Ex2`, containing all houses with 3 or more bedroos *and* a have a full basement.
+
+**Question #5**: Create a data frame named "Q5" that contains all houses with a sale amount greater than $200,000. How many houses are there in this new data set? What is the average sale.amount of this dataset?
+
+
+```{r Q5, exercise = TRUE}
+
+```
+
+
+$~$
+
+## Data Summaries
+
+Descriptive summaries are an essential component of any data analysis. A few functions used to calculate several basic numerical summaries are shown below:
+
+```{r}
+mean(my.data$bedrooms) # mean
+sd(my.data$bedrooms) # standard deviation
+min(my.data$bedrooms) # minimum
+max(my.data$bedrooms ) # maximum
+quantile(my.data$bedrooms, probs = .35) # the 35th percentile
+```
+
+Each of these functions operates on a single variable. For a broader set of summary statistics, you can input an entire data frame into the `summary()` function:
+
+```{r}
+summary(my.data)
+```
+
+Notice how `summary()` is not particularly useful *categorical variables*. For these variables you should be using *frequency tables*.
+
+A *one-way frequency table* shows the frequencies of categories in a single categorical variable, while a *two-way frequency tables* shows the relationship between two categorical variables. Both are created by the `table()` function:
+
+```{r}
+table(my.data$bedrooms) # A one-way frequency table of 'bedrooms'
+table(my.data$bedrooms, my.data$sale.amount > 200000) # A two-way frequency table 
+# Notice how the table function can use numeric, logical, and character variables
+```
+
+$~$
+
+## Practice 
+
+The following code chunk reads in the data file "IowaCityHomeSales.csv" from GitHub:
+
+**Question #6**: Complete the following questions:
+
+A. Use the `names` function to list the names of each column in this dataset.
+B. Find the 20th percentile of the sale amount (i.e. the 20th percentile of the variable "sale.amount").
+C. Create a two-way frequency table using the variables "bsmt" and "attic". 
+D. How many levels exist for "bsmt" (i.e. how many distinct values exist for the bsmt variable)? 
+E. How many levels exist for "attic"?
+F. What style of house has the most fully finished  attics?
+G. Why can we find the mean of `my_data$sale.amount` but not the mean of `my_data$style`?
+
+
+```{r, Q6, exercise = TRUE}
+
+my.data <- read.csv(
+  "https://raw.githubusercontent.com/grinnell-statistics/Grinnell_R_Tutorials/main/data/IowaCityHomeSales.csv",
+  stringsAsFactors = FALSE
+)
+
+
+## Part A
+
+
+## Part B
+
+
+## Part C
+
+```
+
+
+**Question #7**: 
+
+*The College Scorecard* is a government database that record various characteristics of accredited colleges and universities within the United States. A portion of this database containing 2019-2020 data on colleges that primarily award undergraduate degrees and had at least 400 full time students is available at the URL below:
+
+"https://raw.githubusercontent.com/grinnell-statistics/Grinnell_R_Tutorials/main/data/Colleges2019.csv"
+
+
+
+- **Part A**: Load these data into `R` and store them as a data.frame object named `colleges`.
+- **Part B**:  Create a subset of `colleges` that admit fewer than 25% of applicants (as measured by "Adm_Rate"). Store this subject in an object named `colleges_selective`.
+- **Part C**: Using the subset you created in Part B, `colleges_selective`, construct a table containing the proportion of private colleges within each region.
+- **Part D**: Provide a 1-sentence interpretation of one of the proportions in your table (you may choose which one seems most interesting).
+
+```{r, Q7, exercise = TRUE}
+## Part A
+
+## Part B
+
+
+## Part C
+
+```
+
