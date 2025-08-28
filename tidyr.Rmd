@@ -1,6 +1,8 @@
 ---
 title: "Reshaping Data using `tidyr`"
 output:
+  pdf_document:
+    toc: true
   html_document:
     toc: true
     toc_float:
@@ -12,17 +14,13 @@ output:
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.height = 3)
 ```
 
+```{r include=FALSE}
+library(tidyverse)
+```
+
+## The tidyr package
+
 This lab focuses on manipulating, cleaning, and preparing data for visualization (or other analyses) using packages from the [tidyverse suite](https://www.tidyverse.org/packages/).
-
-**Directions** (Please read before starting)
-
-1) Please *work together* with your assigned partner. Make sure you both fully understand each concept before you move on.
-2) Please record your answers and any related code for all embedded lab questions. I encourage you to try out the embedded examples, but you shouldn't turn them in.
-3) Please ask for help, clarification, or even just a check-in if anything seems unclear.
-
-$~$
-
-## Preamble
 
 ### Motivation
 
@@ -40,12 +38,12 @@ names(df) = c("Adm_Rate", "Year", "College")
 #write.csv(df, "C:\\Users\\Ryan M\\Documents\\Grinnell\\remiller1450.github.io\\data\\college_adm.csv", row.names = FALSE)
 ```
 
-As a data scientist, you must be able to connect the *format* of your data and a desired data visualization.
+When working with data, you must be able to connect the *format* of your data and a desired data visualization.
 
 1) If creating an excel spreadsheet from this graphic, how do you think *most people* would record the data?
 2) How should the data be formatted to match the conventions of `ggplot`?
 
-$~$
+
 
 ### Long vs. Wide Data
 
@@ -55,22 +53,14 @@ Data in a **long format** use *multiple rows* and a *single column* for the outc
 
 Example:
 
-![](widelong2.png)
-
-
-```{r, echo = FALSE, eval = FALSE}
-## Create Stocks data
-quantmod::getSymbols(c('AAPL','BRK', 'KO','JNJ', 'AXP'), from = as.Date("2010-01-01"), to = as.Date("2022-01-05"))
-rids = c(1,253,505,755, 1007, 1259, 1511, 1763, 2014, 2266, 2518, 2770, 3022)
-df = data.frame(year = 2010:2022, AAPL = AAPL$AAPL.Close[rids], KO = KO$KO.Close[rids], JNJ = JNJ$JNJ.Close[rids], AXP = AXP$AXP.Close[rids])
-names(df) = c("Year", "AAPL", "KO", "JNJ", "AXP")
-write.csv(df, "C:\\Users\\Ryan M\\Documents\\Grinnell\\remiller1450.github.io\\data\\bluechips.csv", row.names = FALSE)
-bluechips = df
+```{r, echo=FALSE, out.width="120%", fig.align="center"}
+knitr::include_graphics("widelong2.png")
 ```
+
 
 The `ggplot2` package, as well as the implementations of many statistical models, expect data in **long format**. However, many data manipulations are easier to do in wide format; for example, calculating the average improvement from pre-test to post-test.
 
-$~$
+
 
 ### Tidy Data
 
@@ -78,13 +68,13 @@ Converting between "wide" and "long" formats is often the most challenging step 
 
 In general, **tidy data** are defined by the following criteria:
 
-1. Every column is a variable
-2. Every row is an observation
-3. Every cell is a single value
+**1. Every column is a variable**
+**2. Every row is an observation**
+**3. Every cell is a single value**
 
 This lab will introduce several data manipulation functions used to help tidy a data set into a more useful format.
 
-$~$
+
 
 ### Packages and Datasets
 
@@ -100,30 +90,30 @@ library(ggplot2)
 The lab will use several data sets in its examples:
 
 ```{r}
-collegeAdm = read.csv("https://remiller1450.github.io/data/college_adm.csv")
+collegeAdm = read.csv("https://raw.githubusercontent.com/grinnell-statistics/Grinnell_R_Tutorials/refs/heads/main/data/college_adm.csv")
 ```
 
 - **Description**: Admissions rates of three Midwestern liberal arts colleges according to [acceptancerate.com](https://www.acceptancerate.com/schools/grinnell-college)
 
 ```{r}
-bluechips = read.csv("https://remiller1450.github.io/data/bluechips.csv")
+bluechips = read.csv("https://raw.githubusercontent.com/grinnell-statistics/Grinnell_R_Tutorials/refs/heads/main/data/bluechips.csv")
 ```
 
 - **Description**: Closing prices on the first trading day of the year from 2010 to 2021 for four stocks that [The Motley Fool](https://www.fool.com/investing/stock-market/types-of-stocks/blue-chip-stocks/) calls "blue chip" investments.
 
 ```{r}
-polls <- read.csv("https://remiller1450.github.io/data/polls2016.csv")
+polls <- read.csv("https://raw.githubusercontent.com/grinnell-statistics/Grinnell_R_Tutorials/refs/heads/main/data/polls2016.csv")
 ```
 
 - **Description**: Polling data leading up to the 2016 US Presidential Elections scraped from [RealClearPolitics.com](https://www.realclearpolitics.com/epolls/2016/president/us/general_election_trump_vs_clinton_vs_johnson_vs_stein-5952.html#polls)
 
-$~$
+
 
 ## Lab
 
 At this point you will begin working with your partner. Please read through the text/examples and make sure you both understand before attempting to answer the embedded questions.
 
-$~$
+
 
 ### Pivoting between long and wide formats
 
@@ -191,7 +181,7 @@ pivot_longer(wideCollegeAdm2,
 
 **Question #2**: Starting with the long format data frame you created in Question #1, recreate the original `bluechips` data set using `pivot_wider()`.
 
-$~$
+
 
 ### Other `tidyr` functions
 
@@ -234,9 +224,9 @@ While this is not generally recommended, it can work well if there's a clear pat
 
 **Question #3 (Part B)**: Using the `separate()` function, split the column "Candidate" (created in Part A) into two distinct columns containing the name of the candidate (ie: Clinton, Trump, etc.) and their political party (ie: D, R, etc.). *Hint*: periods, or `.`, are a special character in `R`, but you can reference one using the expression: `[.]`. You can also try letting `separate()` guess the proper splitting characters.
 
-$~$
 
-### Practice (required)
+
+### Practice
 
 **Question #4**: The "airlines" data set (loaded below) contains data used in the article [Should Travelers Avoid Flying Airlines That Have Had Crashes in the Past?](http://fivethirtyeight.com/features/should-travelers-avoid-flying-airlines-that-have-had-crashes-in-the-past/) that appeared on fivethirtyeight.com.
 
@@ -269,7 +259,7 @@ tidy_airlines <- pivot_wider(tidy_airlines, id_cols = c(airline, avail_seat_km_p
 head(tidy_airlines)
 ```
 
-$~$
+
 
 **Question #5**: The `iris` data (from the `datasets` package) is a collection of measurements (in cm) of the the sepal and petal dimensions of 50 different flowers coming from 3 different species of iris. These data are frequently attributed to the famous statistician [Ronald Fisher](https://en.wikipedia.org/wiki/Ronald_Fisher)
 
