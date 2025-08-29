@@ -38,8 +38,8 @@ library(ggplot2)
 The lab will use several data sets that we've previously seen:
 
 ```{r}
-colleges <- read.csv("https://remiller1450.github.io/data/Colleges2019.csv")
-bluechips = read.csv("https://remiller1450.github.io/data/bluechips.csv")
+colleges <- read.csv("https://grinnell-statistics.github.io/Grinnell_R_Tutorials/data/Colleges2019.csv")
+bluechips = read.csv("https://grinnell-statistics.github.io/Grinnell_R_Tutorials/data/bluechips.csv")
 ```
 
 ### Workflow and Piping
@@ -289,7 +289,7 @@ $~$
 Intensive care units, or ICUs, are primary spaces in hospitals that are reserved for patients in critical condition. The data below is a random sample of n = 200 ICU patients from a research hospital affiliated with Carnegie Mellon University (CMU).
 
 ```{r}
-icu = read.csv("https://remiller1450.github.io/data/ICUAdmissions.csv")
+icu = read.csv("https://grinnell-statistics.github.io/Grinnell_R_Tutorials/data/ICUAdmissions.csv")
 ```
 
 The data dictionary below documents each variable that was recorded:
@@ -360,5 +360,6 @@ ggplot(data = z_scores, aes(x = Z, fill = as.character(Sex), color = as.characte
 ```{r, echo = FALSE, eval = FALSE}
 icu %>% mutate(Z_score = (HeartRate - mean(HeartRate))/sd(HeartRate)) %>%
 ggplot(aes(x = Z_score, color = as.character(Sex), fill = as.character(Sex))) + geom_histogram(aes(y = after_stat(density)), position = "identity", alpha = 0.4)
-
 ```
+
+

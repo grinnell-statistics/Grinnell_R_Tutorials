@@ -36,7 +36,7 @@ library(ggplot2)
 It will also use data from The College Scorecard:
 
 ```{r}
-colleges <- read.csv("https://remiller1450.github.io/data/Colleges2019.csv")
+colleges <- read.csv("https://grinnell-statistics.github.io/Grinnell_R_Tutorials/data/Colleges2019.csv")
 ```
 
 - **Description**: The `colleges` data set contains attributes and outcomes for all primarily undergraduate institutions in the United States with at least 400 full-time students for the year 2019.
