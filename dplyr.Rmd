@@ -12,17 +12,9 @@ output:
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.height = 3)
 ```
 
+## The dplry package
+
 This lab focuses on manipulating, cleaning, and preparing data for visualization (and other analyses) using packages from the [tidyverse suite](https://www.tidyverse.org/packages/).
-
-**Directions** (Please read before starting)
-
-1) Please *work together* with your assigned partner. Make sure you both fully understand each concept before you move on.
-2) Please record your answers and any related code for all embedded lab questions. I encourage you to try out the embedded examples, but you shouldn't turn them in.
-3) Please ask for help, clarification, or even just a check-in if anything seems unclear.
-
-$~$
-
-## Preamble
 
 ### Packages and Datasets
 
@@ -42,7 +34,7 @@ colleges <- read.csv("https://grinnell-statistics.github.io/Grinnell_R_Tutorials
 bluechips = read.csv("https://grinnell-statistics.github.io/Grinnell_R_Tutorials/data/bluechips.csv")
 ```
 
-### Workflow and Piping
+## Workflow and Piping
 
 As a data scientist, you should strive to write code that is:
 
@@ -93,15 +85,8 @@ new_bluechips <- bluechips %>%
 
 *Note*: all functions in the `tidyverse` suite of packages are compatible with the `%>%` operator, so we can including pivoting steps in a pipeline.
 
-$~$
 
-## Lab
-
-At this point you will begin working with your partner. Please read through the text/examples and make sure you both understand before attempting to answer the embedded questions.
-
-$~$
-
-### Overview of Data Manipulation
+## Overview of Data Manipulation
 
 The `dplyr` package contains a suite of functions designed to make data manipulation easier. The package's core functions can be viewed as verbs:
 
@@ -116,7 +101,6 @@ Verb/Function         | Meaning
 
 Importantly, these functions can be strung together using *piping*. But first, let's see a few examples of how they work individually.
 
-$~$
 
 **Filter**
 
@@ -128,7 +112,7 @@ Example:
 ## Colleges in Iowa w/ an ACT median above 25
 colleges %>% filter(State == "IA", ACT_median > 25)
 ```
-$~$
+
 
 **Arrange**
 
@@ -159,14 +143,14 @@ colleges %>%
   arrange(desc(PercentFemale))
 ```
 
-$~$
+
 
 **Select**
 
 The `select()` function is used to reduce the number of variables in a data set:
 
 ```{r}
-### Keep only the Name, ACT_median, and Net_Tuition variables
+# Keep only the Name, ACT_median, and Net_Tuition variables
 IA_selective <- colleges %>% 
   filter(State == "IA" & ACT_median > 25) %>%
   select(Name, ACT_median, Cost, Net_Tuition)
@@ -176,14 +160,14 @@ IA_selective
 Sometimes you'll want to keep most of your variables, dropping only a few that are no longer necessary. To drop a variable using `select()`, you can place a `-` character in front of its name:
 
 ```{r}
-### Keep everything but the State and City variables
+# Keep everything but the State and City variables
 IA_selective <- colleges %>% 
   filter(State == "IA" & ACT_median > 25) %>%
   select(-State, -City)
 IA_selective
 ```
 
-$~$
+
 
 **Mutate**
 
@@ -208,7 +192,7 @@ Q3 <- colleges %>%
 Q3
 ```
 
-$~$
+
 
 **Summarize**
 
@@ -236,7 +220,7 @@ colleges %>%
 
 $~$
 
-### Group-wise Manipulation
+## Group-wise Manipulation
 
 Frequently, we'd like to perform parallel calculations for different subsets of data. For example, you might want to find the mean and standard deviation of the variable "Cost" separately for every state, or you might even want to find it separately for the private and public schools in each different state.
 
@@ -282,9 +266,9 @@ colleges %>%
 
 Notice how `summarize()` returns an object with 1 row per group, while `mutate()` returns an object with 1 row per observation.
 
-$~$
 
-### Practice (required)
+
+## Practice (required)
 
 Intensive care units, or ICUs, are primary spaces in hospitals that are reserved for patients in critical condition. The data below is a random sample of n = 200 ICU patients from a research hospital affiliated with Carnegie Mellon University (CMU).
 
@@ -348,7 +332,7 @@ z_scores = icu %>% group_by(Sex) %>%
                 Z = (HeartRate - mean(HeartRate, na.rm = TRUE))/sd(HeartRate, na.rm = TRUE)) %>%
              select(ID, Sex, HR_sex_avg, HR_sex_sd, Z)
 
-### Code for the graph
+# Code for the graph
 ggplot(data = z_scores, aes(x = Z, fill = as.character(Sex), color = as.character(Sex))) + 
   geom_histogram(aes(y = after_stat(density)), position = "identity", alpha = 0.4) + 
                    labs(color = "Sex", fill = "Sex", x = "Heart Rate Z-score") +
