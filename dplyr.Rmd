@@ -36,7 +36,7 @@ bluechips = read.csv("https://grinnell-statistics.github.io/Grinnell_R_Tutorials
 
 ## Workflow and Piping
 
-As a data scientist, you should strive to write code that is:
+You should strive to write code that is:
 
 1) *Legible* - a peer could easily determine what each line is doing
 2) *Efficient* - it avoids redundant, unnecessary, or computationally burdensome steps
@@ -268,7 +268,7 @@ Notice how `summarize()` returns an object with 1 row per group, while `mutate()
 
 
 
-## Practice (required)
+## Practice
 
 Intensive care units, or ICUs, are primary spaces in hospitals that are reserved for patients in critical condition. The data below is a random sample of n = 200 ICU patients from a research hospital affiliated with Carnegie Mellon University (CMU).
 
