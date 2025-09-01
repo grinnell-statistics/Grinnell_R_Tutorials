@@ -109,13 +109,7 @@ polls <- read.csv("https://grinnell-statistics.github.io/Grinnell_R_Tutorials/da
 
 
 
-## Lab
-
-At this point you will begin working with your partner. Please read through the text/examples and make sure you both understand before attempting to answer the embedded questions.
-
-
-
-### Pivoting between long and wide formats
+## Pivoting between long and wide formats
 
 Consider the `collegeAdm` data frame:
 
@@ -183,7 +177,7 @@ pivot_longer(wideCollegeAdm2,
 
 
 
-### Other `tidyr` functions
+## Other `tidyr` functions
 
 Pivoting or reshaping is often only one of many steps needed to tidy a data set. Another common occurrence is that data will contain multiple variables in a single column. For example, consider the "Date" and "Sample" columns in the `polls` data set:
 
@@ -226,7 +220,7 @@ While this is not generally recommended, it can work well if there's a clear pat
 
 
 
-### Practice
+## Practice
 
 **Question #4**: The "airlines" data set (loaded below) contains data used in the article [Should Travelers Avoid Flying Airlines That Have Had Crashes in the Past?](http://fivethirtyeight.com/features/should-travelers-avoid-flying-airlines-that-have-had-crashes-in-the-past/) that appeared on fivethirtyeight.com.
 
