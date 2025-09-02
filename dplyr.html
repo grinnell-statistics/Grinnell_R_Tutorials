@@ -1483,21 +1483,10 @@ border-radius: 0px;
 </div>
 
 
+<div id="the-dplry-package" class="section level2">
+<h2>The dplry package</h2>
 <p>This lab focuses on manipulating, cleaning, and preparing data for
 visualization (and other analyses) using packages from the <a href="https://www.tidyverse.org/packages/">tidyverse suite</a>.</p>
-<p><strong>Directions</strong> (Please read before starting)</p>
-<ol style="list-style-type: decimal">
-<li>Please <em>work together</em> with your assigned partner. Make sure
-you both fully understand each concept before you move on.</li>
-<li>Please record your answers and any related code for all embedded lab
-questions. I encourage you to try out the embedded examples, but you
-shouldn’t turn them in.</li>
-<li>Please ask for help, clarification, or even just a check-in if
-anything seems unclear.</li>
-</ol>
-<p><span class="math inline">\(~\)</span></p>
-<div id="preamble" class="section level2">
-<h2>Preamble</h2>
 <div id="packages-and-datasets" class="section level3">
 <h3>Packages and Datasets</h3>
 <p>This lab will primarily use the `<code>dplyr</code> package, which is
@@ -1511,9 +1500,10 @@ library(ggplot2)</code></pre>
 <pre class="r"><code>colleges &lt;- read.csv(&quot;https://grinnell-statistics.github.io/Grinnell_R_Tutorials/data/Colleges2019.csv&quot;)
 bluechips = read.csv(&quot;https://grinnell-statistics.github.io/Grinnell_R_Tutorials/data/bluechips.csv&quot;)</code></pre>
 </div>
-<div id="workflow-and-piping" class="section level3">
-<h3>Workflow and Piping</h3>
-<p>As a data scientist, you should strive to write code that is:</p>
+</div>
+<div id="workflow-and-piping" class="section level2">
+<h2>Workflow and Piping</h2>
+<p>You should strive to write code that is:</p>
 <ol style="list-style-type: decimal">
 <li><em>Legible</em> - a peer could easily determine what each line is
 doing</li>
@@ -1580,17 +1570,9 @@ new_bluechips &lt;- bluechips %&gt;%
 <p><em>Note</em>: all functions in the <code>tidyverse</code> suite of
 packages are compatible with the <code>%&gt;%</code> operator, so we can
 including pivoting steps in a pipeline.</p>
-<p><span class="math inline">\(~\)</span></p>
 </div>
-</div>
-<div id="lab" class="section level2">
-<h2>Lab</h2>
-<p>At this point you will begin working with your partner. Please read
-through the text/examples and make sure you both understand before
-attempting to answer the embedded questions.</p>
-<p><span class="math inline">\(~\)</span></p>
-<div id="overview-of-data-manipulation" class="section level3">
-<h3>Overview of Data Manipulation</h3>
+<div id="overview-of-data-manipulation" class="section level2">
+<h2>Overview of Data Manipulation</h2>
 <p>The <code>dplyr</code> package contains a suite of functions designed
 to make data manipulation easier. The package’s core functions can be
 viewed as verbs:</p>
@@ -1632,7 +1614,6 @@ viewed as verbs:</p>
 <p>Importantly, these functions can be strung together using
 <em>piping</em>. But first, let’s see a few examples of how they work
 individually.</p>
-<p><span class="math inline">\(~\)</span></p>
 <p><strong>Filter</strong></p>
 <p>The <code>filter()</code> function is nearly identical to the
 <code>subset()</code> function from base R. The only difference is that
@@ -1666,7 +1647,6 @@ colleges %&gt;% filter(State == &quot;IA&quot;, ACT_median &gt; 25)</code></pre>
 ## 3            0.8372093       15000             49100
 ## 4            0.7553191       25250             47400
 ## 5            0.6572554       16173             51900</code></pre>
-<p><span class="math inline">\(~\)</span></p>
 <p><strong>Arrange</strong></p>
 <p>The <code>arange()</code> function sorts the rows of your data by one
 or more numeric variables:</p>
@@ -1735,11 +1715,10 @@ only private colleges in the Mid East and New England regions. Then sort
 these schools according to the variable “PercentFemale” such that the
 school with the largest share of female students appears at the top of
 the list.</p>
-<p><span class="math inline">\(~\)</span></p>
 <p><strong>Select</strong></p>
 <p>The <code>select()</code> function is used to reduce the number of
 variables in a data set:</p>
-<pre class="r"><code>### Keep only the Name, ACT_median, and Net_Tuition variables
+<pre class="r"><code># Keep only the Name, ACT_median, and Net_Tuition variables
 IA_selective &lt;- colleges %&gt;% 
   filter(State == &quot;IA&quot; &amp; ACT_median &gt; 25) %&gt;%
   select(Name, ACT_median, Cost, Net_Tuition)
@@ -1754,7 +1733,7 @@ IA_selective</code></pre>
 few that are no longer necessary. To drop a variable using
 <code>select()</code>, you can place a <code>-</code> character in front
 of its name:</p>
-<pre class="r"><code>### Keep everything but the State and City variables
+<pre class="r"><code># Keep everything but the State and City variables
 IA_selective &lt;- colleges %&gt;% 
   filter(State == &quot;IA&quot; &amp; ACT_median &gt; 25) %&gt;%
   select(-State, -City)
@@ -1783,7 +1762,6 @@ IA_selective</code></pre>
 ## 3            0.8372093       15000             49100
 ## 4            0.7553191       25250             47400
 ## 5            0.6572554       16173             51900</code></pre>
-<p><span class="math inline">\(~\)</span></p>
 <p><strong>Mutate</strong></p>
 <p>The <code>mutate()</code> function is used to add a new column to
 your data that is a function of one or more existing variables:</p>
@@ -1809,7 +1787,6 @@ increases by 3% each year. Print this new data frame as part of your
 answer. <em>Hint</em>: In year 1 the cumulative cost for a student is
 <code>Cost</code>, in year 2 the cumulative cost is
 <code>Cost + 1.03*Cost</code>, etc.</p>
-<p><span class="math inline">\(~\)</span></p>
 <p><strong>Summarize</strong></p>
 <p>The <code>summarize()</code> function will calculate summary
 statistics that require an aggregation of rows. For example:</p>
@@ -1837,8 +1814,8 @@ the variable “Debt_Cost_Ratio” that you created in Question #2.
 minus the 25th percentile.</p>
 <p><span class="math inline">\(~\)</span></p>
 </div>
-<div id="group-wise-manipulation" class="section level3">
-<h3>Group-wise Manipulation</h3>
+<div id="group-wise-manipulation" class="section level2">
+<h2>Group-wise Manipulation</h2>
 <p>Frequently, we’d like to perform parallel calculations for different
 subsets of data. For example, you might want to find the mean and
 standard deviation of the variable “Cost” separately for every state, or
@@ -1921,10 +1898,9 @@ colleges %&gt;%
 <p>Notice how <code>summarize()</code> returns an object with 1 row per
 group, while <code>mutate()</code> returns an object with 1 row per
 observation.</p>
-<p><span class="math inline">\(~\)</span></p>
 </div>
-<div id="practice-required" class="section level3">
-<h3>Practice (required)</h3>
+<div id="practice" class="section level2">
+<h2>Practice</h2>
 <p>Intensive care units, or ICUs, are primary spaces in hospitals that
 are reserved for patients in critical condition. The data below is a
 random sample of n = 200 ICU patients from a research hospital
@@ -1992,7 +1968,6 @@ density scale, and <code>position = &quot;identity&quot;</code> to prevent them
 from overlapping. The graphics parameter <code>alpha</code> was used to
 provide partial transparency, and <code>scale_fill_manual()</code> was
 used to modify the color scheme and color/fill labels.</p>
-</div>
 </div>
 
 
