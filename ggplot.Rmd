@@ -75,7 +75,7 @@ ggplot(data = colleges, mapping = aes(x = Cost, y = Net_Tuition)) +
   annotate("text", x =20000, y=40000, label = "Data from 2019")
 ```
 
-*Note*: A high-quality graphic doesn't require any particular number of layers. In fact, more layers can sometimes detract from the clarity of a data visualization.
+*NOTE*: A high-quality graphic doesn't require any particular number of layers. In fact, more layers can sometimes detract from the clarity of a data visualization.
 
 $~$
 
