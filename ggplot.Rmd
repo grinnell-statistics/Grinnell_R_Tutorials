@@ -77,7 +77,7 @@ ggplot(data = colleges, mapping = aes(x = Cost, y = Net_Tuition)) +
 
 *NOTE*: A high-quality graphic doesn't require any particular number of layers. In fact, more layers can sometimes detract from the clarity of a data visualization.
 
-$~$
+
 
 ### More on the base layer
 
