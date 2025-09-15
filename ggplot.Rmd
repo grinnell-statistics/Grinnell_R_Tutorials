@@ -253,7 +253,7 @@ There are two things you should note at this point:
 
 **Question #4**: Modify the code below to make the shape squares with blue outlines and red fill. Then use `alpha =.4` to reduce the transparency of the squares.
 
-```{r, eval = FALSE, echo = FALSE}
+```{r}
 ggplot(data = colleges, mapping = aes(x = Adm_Rate, y = Net_Tuition)) +
   geom_point(color = "darkgreen", shape = 1) 
   
